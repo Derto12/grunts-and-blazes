@@ -5,15 +5,31 @@ const app = express()
 const http = require('http');
 const server = http.createServer(app);
 
-const {getStats} = require('./actions')
+const {getStats} = require('./actions');
+const helmet = require('helmet');
+const path = require('path');
+
+const scriptSources = ["'self'",'https://cdn.socket.io','https://cdnjs.cloudflare.com']    
+const helmetOptions = {
+    crossOriginEmbedderPolicy: true,
+    crossOriginResourcePolicy: false,
+    contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+            "script-src": scriptSources
+        }
+    },
+}
 
 async function main(){
+    app.use(helmet(helmetOptions))
+
     const handleSockets = require('./sockets')
     await handleSockets(server)
 
     app.use(express.static('public'))
 
-    let sprite = fs.readFileSync(__dirname + '/sprite.js', 'utf-8')
+    let sprite = fs.readFileSync(path.normalize(__dirname + '/sprite.js'), 'utf-8');
     sprite = sprite.split('~')[0].replace('//', '')
 
     app.get('/sprite.js', (req, res) => {
@@ -28,9 +44,10 @@ async function main(){
     const port = process.env.PORT || 3000
     const start = async() => {
         try{
-            server.listen(port, () => console.log(`server is listening on http://127.0.0.1:${port}`))
+            await server.listen(port, () => console.log(`server is listening on http://127.0.0.1:${port}`))
         } catch(error){
-            console.log(error)
+            console.error('Error starting server:', error);
+            process.exit(1); // Restart server if it fails to start
         }
     }
 
