@@ -1,0 +1,286 @@
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;600;700&display=swap');
+
+*{
+    margin: 0;
+    box-sizing: border-box;
+}
+:root{
+    --tools-height: 2rem;
+    --canvas-width: 720px;
+    --canvas-height: 480px;
+    --canvas-top: var(--tools-height);
+    --wolf-color: rgb(39, 166, 175);
+    --pig-color: rgb(186, 123, 223);
+    --dark-gray: rgb(26, 26, 26);
+    --health-cont-height: 25px;
+}
+
+*{
+    font-family: 'Inconsolata', monospace;
+}
+
+body{
+    background-color: rgb(30, 33, 37) !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+main{
+    position: relative;
+}
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+}
+
+#canvas{
+    width: var(--canvas-width);
+    height: var(--canvas-height);
+}
+#controlls{
+    color: white;
+    margin-top: 1em;
+}
+#controlls h2{
+    margin-top: .3em;
+    margin-bottom: .5em;
+}
+#controlls ul{
+    width: var(--canvas-width);
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+}
+#controlls li{
+    list-style-type: none;
+    padding-left: none;
+}
+#controlls div{
+    margin-bottom: .7em;
+    text-align: center;
+}
+#controlls div:nth-child(2){
+    font-size: .85rem;
+}
+#controlls span{
+    padding: .25em .5em;
+    background-color: gray;
+    border-radius: .2em;
+    font-weight: bold;
+    margin-top: 1em;
+    margin-left: .2em;
+}
+#controlls li {
+    margin-bottom: .5em;
+}
+
+#join{
+    position: absolute;
+    top: calc(var(--canvas-height) / 1.4);
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    /* gap: 3rem; */
+}
+#join > div {
+    display: flex;
+}
+#join button{
+    z-index: 10;
+    font-size: calc(var(--canvas-width) / 50);
+    padding: .8em;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    width: 8em;
+}
+#join button:hover{
+    opacity: 80%;
+}
+#wolf-btn{
+    background-color: var(--wolf-color);
+}
+#pig-btn{
+    background-color: var(--pig-color);
+}
+#revive-btn{
+    position: absolute;
+    top: calc(var(--canvas-height) / 1.4);
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    z-index: 15;
+    font-size: calc(var(--canvas-width) / 38);
+    padding: .8em 2em;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    background-color: black;
+    opacity: 0.8;
+}
+#revive-btn:hover{
+    color: black;
+    background-color: white;
+}
+#name-input{
+    color: white;
+    background-color: var(--dark-gray);
+    padding-left: 1em;
+    border: none;
+    user-select: none;
+    border-radius: .5em 0 0 .5em;
+    font-size: calc(var(--canvas-width) / 50);
+}
+
+#tools{
+    width: 100%;
+    height: var(--tools-height);
+    background-color: var(--dark-gray);
+    color: white;
+    font-size: 1.3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .5em;
+}
+
+#tools i{
+    cursor: pointer;
+}
+
+#tools span{
+    font-size: .7rem;
+    margin-left: 1em;
+    vertical-align: middle;
+}
+
+#stats {
+    position: absolute;
+    top: var(--canvas-top);
+    width: var(--canvas-width);
+    height: var(--canvas-height);
+    display: none;
+}
+td {
+    color: white;
+    font-family: 'Inconsolata', monospace;
+    padding: 0.25em;
+    background-color: rgba(26, 26, 26, 0.8);
+}
+#allteams-table {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(26, 26, 26, 0.1);
+    overflow: scroll;
+    border-collapse: collapse;
+}
+#allteams-table > tbody > tr > td {
+    vertical-align: top;
+}
+#wolf-header, #pig-header {
+    vertical-align: center;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.25rem;
+    padding: 0.5em;
+}
+#wolf-header {
+    color: rgb(222, 249, 251);
+    background-color: rgba(0, 125, 134, 0.75)
+}
+#pig-header {
+    color: rgb(233, 215, 243);
+    background-color: rgba(153, 4, 153, 0.75);
+}
+.team-table > thead > tr > td {
+    background-color: unset;
+    font-weight: bold;
+    padding-bottom: 0;
+    padding-left: 0.1em;
+    vertical-align: bottom;
+    border-bottom: 1px #ffffffab solid;
+}
+.team-table > tbody > tr {
+    width: 100%;
+}
+.team-table > tbody > tr > td {
+    min-width: 30%;
+    text-align: center;
+}
+.team-table > tbody > tr > td:nth-child(3n - 2) {
+    width: 100%;
+    font-weight: bold;
+    text-align: left;
+}
+#wolfs-table > tbody > tr > td:nth-child(3n - 2) {
+    color: rgb(6, 145, 155);
+}
+#pigs-table > tbody > tr > td:nth-child(3n - 2) {
+    color: rgb(175, 91, 175);
+}
+
+#health-cont{
+    position: relative;
+    width: 20rem;
+    height: var(--health-cont-height);
+    border-bottom-right-radius: 3px;
+    overflow: hidden;
+    background-color: rgb(216, 210, 184);
+    display: none;
+}
+#health{
+    background-color: rgb(226, 76, 76);
+    height: 100%;
+    width: 100%;
+    transition: all .4s ease-out;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding-left: .25rem;
+}
+
+#msgBox{
+    display: none;
+    position: absolute;
+    top: calc(var(--canvas-height) + var(--canvas-top));
+    font-size: 1.2rem;
+    width: var(--canvas-width);
+    transform: translateY(-100%);
+    z-index: 100;
+    background-color: rgb(30, 33, 37);
+    color: rgb(238, 238, 238);
+    padding-left: 1em;
+}
+
+#zone-joystick{
+    width: 8rem;
+    height: 8rem;
+    position: absolute;
+    top: calc(var(--canvas-top) + var(--canvas-height) - 8rem);
+    /* background-color: red; */
+}
+
+#phone-cont{
+    position: absolute;
+    top: calc(var(--canvas-top));
+    z-index: 20;
+    margin-left: .3em;
+    margin-top: .3em;
+    display: none;
+}
+
+#phone-cont button{
+    padding: .3em .5em;
+    border-radius: .25em;
+    border: none;
+    cursor: pointer;
+    color: white;
+    background-color: var(--dark-gray);
+    display: block;
+    margin-bottom: .5em;
+}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <title>Grunts & Blazes</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <main>
+        <div id="tools">
+            <div><i class="fa-solid fa-mobile" id="mobile-btn"></i><span>(mobile view)</span></div>
+            <i class="fa-solid fa-maximize" id="maximize"></i>
+        </div>
+        <div id="phone-cont">
+            <button id="stats-btn"><i id class="fa-solid fa-table-list"></i></button>
+            <button id="msg-btn"><i class="fa-solid fa-message"></i></button>
+        </div>
+        <div id="join">
+            <input type="text" placeholder="Enter a username. . ." id="name-input">
+            <div>
+                <button id="pig-btn">Join Team PIG</button>
+                <button id="wolf-btn">Join Team WOLF</button>
+            </div>
+        </div>
+        <button id="revive-btn">Revive</button>
+        <canvas id="canvas"></canvas>
+        <input type="text" id="msgBox" placeholder="Type something...">
+        <div id="stats">
+            <table id="allteams-table">
+                <thead>
+                    <tr>
+                        <td id="pig-header">Team PIG</td>
+                        <td id="wolf-header">Team WOLF</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <table id="pigs-table" class="team-table">
+                                <thead>
+                                    <tr>
+                                        <td>Name</td>
+                                        <td>Kills</td>
+                                        <td>Deaths</td>
+                                    </tr>
+                                </thead>
+                                <tbody id="pig-stats">
+                                </tbody>
+                            </table>
+                        </td>
+                        <td>
+                            <table id="wolfs-table" class="team-table">
+                                <thead>
+                                    <tr>
+                                        <td>Name</td>
+                                        <td>Kills</td>
+                                        <td>Deaths</td>
+                                    </tr>
+                                </thead>
+                                <tbody id="wolf-stats">
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="health-cont">
+                <div id="health">
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+        </div>
+        <div id="zone-joystick"></div>
+        <div id="controlls">
+            <ul>
+                <li><div><span>w</span><span>a</span><span>s</span><span>d</span></div><div>Move</div></li>
+                <li><div><span><i class="fa-solid fa-computer-mouse"></i> - left click</span></div><div>Attack</div></li>
+                <li><div><span>/</span></div><div>Toggle chat</div></li>
+                <li><div><span><i class="fa-sharp fa-solid fa-arrow-right-arrow-left"></i></span></div><div>View team stats</div></li>
+            </ul>
+        </div>
+    </main>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.0/nipplejs.min.js"></script>
+    <script type="module" src="sprite.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>
