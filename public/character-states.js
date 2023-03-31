@@ -143,7 +143,8 @@ const pigStates = {
         },
         frames: 5,
         frameHold: 3
-    }
+    },
+    gunImg
 }
 
 export {wolfStates, pigStates}

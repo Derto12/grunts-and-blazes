@@ -4,7 +4,7 @@ let players = {
     pigs: []
 }
 let guestCount = 0
-let dict = {}
+let playerMap = new Map()
 let blocks = []
 let props = []
 let bullets = []
@@ -20,9 +20,7 @@ const setParams = (collisionBlocks, collisionProps) => {
 }
 
 const getStats = () => {
-    const filtered = Object.entries(dict).map(([_, value]) => 
-        value.getStats()
-    )
+    const filtered = playerMap.values.map( value => value.getStats())
     return filtered
 }
 
@@ -59,7 +57,7 @@ const join = (id, {name, team}) => {
 
     let player = getNewPlayer(team, {id, name})
     
-    dict[id] = player
+    playerMap.set(id, player)
     players[team].push(player)
     console.log(team, 'player joined')
 
@@ -67,27 +65,27 @@ const join = (id, {name, team}) => {
 }
 
 const revive = (id) => {
-    const user = dict[id]
-    if(user){
+    if(playerMap.has(id)){
+        const user = playerMap.get(id)
         const player = getNewPlayer(user.team, {id, name: user.name, kills: user.kills, deaths: user.deaths})
-        dict[id] = player
+        playerMap.set(id, player)
         players[user.team].push(player)
     }
 }
 
 const disconnect = (id) => {
-    const user = dict[id]
-    if(user){
+    if(playerMap.has(id)){
+        const user = playerMap.get(id)
         players[user.team] = players[user.team].filter((p) => p.id != id)
-        delete dict[id]
+        playerMap.delete(id)
     }
     console.log('client disconnected')
 }
 
 const move = (id, params) => {
-    const player = dict[id]
-    if(player && !player.isDead){
-        player.move(params)
+    if(playerMap.has(id)){
+        const player = playerMap.get(id)
+        if(!player.isDead) player.move(params)
     }
 }
 
@@ -128,7 +126,7 @@ const update = () => {
 }
 
 const attack = (id, angle) => {
-    const player = dict[id]
+    const player = playerMap.get(id)
     if(player && !player.isDead){
         player.attack()
         if(player.team === 'pigs' && player.isAttacking && angle){
@@ -145,8 +143,8 @@ const attack = (id, angle) => {
 }
 
 const message = (id, msg) => {
-    const player = dict[id]
-    if(player){
+    if(playerMap.has(id)){
+        const player = playerMap.get(id)
         player.sendMsg(msg)
     }
 }

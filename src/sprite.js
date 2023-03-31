@@ -3,6 +3,7 @@
  * All rights reserved
  * github.com/derto12
  */
+//import { pigStates, wolfStates } from "./character-states.js";
 
 const PLAYER_SPEED = 4
 
@@ -153,14 +154,14 @@ class Player extends ScreenObj{
         return { id: this.id, team: this.team, name: this.name, kills: this.kills, deaths: this.deaths }
     }
 
-    draw(ctx){
+    draw(ctx, states){
         let state
-        if(this.dieingAnimation) state = this.dieState
-        else if(this.isDead) state = this.deathState
-        else if(this.isBeingHit) state = this.hitState
-        else if(this.attackAnimation && this.attackState) state = this.attackState
-        else if(this.velocity.x !== 0 || this.velocity.y !== 0) state = this.runState
-        else state = this.idleState
+        if(this.dieingAnimation) state = states.dieState
+        else if(this.isDead) state = states.deathState
+        else if(this.isBeingHit) state = states.hitState
+        else if(this.attackAnimation && states.attackState) state = states.attackState
+        else if(this.velocity.x !== 0 || this.velocity.y !== 0) state = states.runState
+        else state = states.idleState
         
         const stateImg = state.imgs[this.orientation]
         const frameWidth = stateImg.width / state.frames
@@ -322,7 +323,7 @@ class Wolf extends Player{
     }
 
     canAttack(target){
-        return sphereRectCollides(this.attackCircle, target.hitBox)
+        return sphereAndRectCollides(this.attackCircle, target.hitBox)
     }
 
     updateAttackBox(){
@@ -337,8 +338,8 @@ class Wolf extends Player{
     }
 
     drawScratch(ctx){
-        const state = this.attackState.scratch
-        const stateImg = this.attackState.scratch.imgs[this.orientation]
+        const state = wolfStates.attackState.scratch
+        const stateImg = wolfStates.attackState.scratch.imgs[this.orientation]
         const frameWidth = stateImg.width / state.frames
         const cropBox = {
             position: { 
@@ -369,7 +370,7 @@ class Wolf extends Player{
     }
 
     draw(ctx){
-        super.draw(ctx)
+        super.draw(ctx, wolfStates)
         if(this.attackAnimation) this.drawScratch(ctx)
     }
 }
@@ -396,7 +397,7 @@ class Pig extends Player{
     }
 
     draw(ctx){
-        super.draw(ctx)
+        super.draw(ctx, pigStates)
         if(!this.isDead) this.drawGun(ctx)
     }
 
@@ -415,9 +416,9 @@ class Pig extends Player{
             ctx.translate(posX, this.gun.position.y)
             ctx.rotate(this.attackAngle)
         }
-        ctx.drawImage(this.gunImg,
+        ctx.drawImage(pigStates.gunImg,
             0, 0,
-            this.gunImg.width, this.gunImg.height,
+            pigStates.gunImg.width, pigStates.gunImg.height,
             -this.gun.width / 2, -this.gun.height / 2,
             this.gun.width, this.gun.height
         )

@@ -30,7 +30,7 @@ async function main(){
     app.use(express.static('public'))
 
     let sprite = fs.readFileSync(path.normalize(__dirname + '/sprite.js'), 'utf-8');
-    sprite = sprite.split('~')[0].replace('//', '')
+    sprite = sprite.split('~')[0].replace(/\/\//g, '');
 
     app.get('/sprite.js', (req, res) => {
         res.status(200).type('application/javascript').send(sprite)

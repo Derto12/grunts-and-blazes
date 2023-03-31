@@ -19,5 +19,3 @@ joystick.on('move', function (evt, data) {
 joystick.on('end', function (evt) {
     socket.emit('moveupdate', {vector: {x: 0, y: 0}})
 })
-
-export { zone }

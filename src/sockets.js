@@ -27,8 +27,8 @@ const handleSockets = async(server) => {
         socket.on('revive', () => actions.revive(socket.id))
     })
 
-    let i = 0
-    let lastUpdate = new Date().getTime()
+    // let i = 0
+    // let lastUpdate = new Date().getTime()
     // function fps(){
     //     const now = new Date().getTime()
     //     if(i % 100 === 0) console.log('fps', 1000/(now - lastUpdate))
