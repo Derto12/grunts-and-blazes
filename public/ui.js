@@ -1,13 +1,18 @@
 import { isMobileScreen, fullscreen } from "./state.js"
-import { msgBoxFocused } from "./events.js"
 import { map } from "./game.js"
 
 const elem = document.documentElement
 const root = document.querySelector(':root')
+const msgElem = document.getElementById('msgBox')
 const ORIG_SIZE = {width: 1080, height: 720}
 const SMALL_SIZE = {width: 720, height: 480}
 const MOBILE_SMALL_SIZE = {width: 420, height: 280}
 let scale = SMALL_SIZE.width / ORIG_SIZE.width
+
+export let msgBoxFocused = false
+export function setMsgBoxFocus(value){
+    msgBoxFocused = value
+}
 
 function openFullscreen() {
     if (elem.requestFullscreen) {
@@ -25,7 +30,7 @@ export const cam = {
     minPos: { x: 0, y: 0},
     maxPos: { x: 0, y: 0} 
 }
-const setCanvasSize = (newSize) => {
+function setCanvasSize(newSize){
     pushX = (ORIG_SIZE.width - newSize.width) / 2
     pushY = (ORIG_SIZE.height - newSize.height) / 2
     scale = newSize.width / ORIG_SIZE.width
@@ -41,20 +46,20 @@ const setCanvasSize = (newSize) => {
 }
 
 const tools = document.getElementById('tools')
-const minimize = (size) => {
+function minimize(size){
     tools.style.display = 'flex'
     if(!isMobileScreen) controlls.style.display = 'block'
     setCanvasSize(size)
 }
 
-const maximize = (size) => {
+function maximize(size){
     tools.style.display = 'none'
     controlls.style.display = 'none'
     setCanvasSize(size)
 }
 
 let showMsgBox = false
-const messageBox = () => {
+function messageBox(){
     showMsgBox = !showMsgBox
     if(showMsgBox){
         msgElem.style.display = 'block'
@@ -62,7 +67,7 @@ const messageBox = () => {
     } else {
         msgElem.style.display = 'none'
     }
-    msgBoxFocused = false
+    setMsgBoxFocus(false)
 }
 
 function setScreen(){

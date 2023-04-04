@@ -1,9 +1,9 @@
 import { socket } from "./socket.js"
 import { me, myTeam } from "./game.js"
-import { cam } from "./ui.js"
+import { cam, messageBox, msgBoxFocused, setMsgBoxFocus } from "./ui.js"
+import { changeStatsState } from "./stats.js"
 
 const msgElem = document.getElementById('msgBox')
-let msgBoxFocused = false
 let lastKey
 const keys = {
     w: { pressed: false },
@@ -19,7 +19,7 @@ function sendMsg(){
 function addCharToMsgBox(e){
     e.preventDefault()
     if(msgBoxFocused && e.key.length === 1) msgElem.value += e.key
-    msgBoxFocused = true
+    setMsgBoxFocus(true)
 }
 function windowKeyDown(e){
     if(Object.keys(keys).includes(e.key) && !msgBoxFocused){
@@ -65,8 +65,8 @@ function windowTouchMove(e){
 
 function addGameEvents(){
     msgElem.addEventListener('keypress', (e) => addCharToMsgBox(e))
-    msgElem.addEventListener('focusin', () => {msgBoxFocused = true})
-    msgElem.addEventListener('focusout', () => {msgBoxFocused = false})
+    msgElem.addEventListener('focusin', () => {setMsgBoxFocus(true)})
+    msgElem.addEventListener('focusout', () => {setMsgBoxFocus(false)})
 
     canvas.addEventListener('click', (e) => canvasClick(e))
 
@@ -76,6 +76,5 @@ function addGameEvents(){
 }
 
 export {
-    msgBoxFocused,
     addGameEvents
 }

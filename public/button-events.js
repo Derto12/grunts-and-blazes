@@ -2,6 +2,7 @@ import { myTeam, setMyTeam } from "./game.js"
 import { socket } from "./socket.js"
 import { changeScreenState} from "./state.js"
 import { messageBox, openFullscreen } from "./ui.js"
+import { changeStatsState } from "./stats.js"
 
 const nameInput = document.getElementById('name-input')
 document.getElementById('pig-btn').onclick = () => {

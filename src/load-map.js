@@ -1,5 +1,5 @@
 const tmx = require('tmx-parser')
-const blocks = require('./collisions')
+const blocks = require('./collision-blocks')
 
 const getMap = async() => {
     const getLayer = (tiles, width, height) => {

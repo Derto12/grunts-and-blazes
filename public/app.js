@@ -9,7 +9,7 @@ import './button-events.js'
 import './joystick.js';
 import { renderTiles, calculateProps } from './utils.js'
 import { gameState, updateGameState, changeGameState} from './state.js';
-import { SMALL_SIZE} from './ui.js'
+import { SMALL_SIZE} from './ui.js';
 import { addGameEvents } from './events.js';
 import { game, loading, mainmenu, deadmenu, myTeam, setMyTeam, me, setMe, map} from './game.js';
 

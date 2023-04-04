@@ -1,4 +1,4 @@
-import { pushX, pushY, cam, scale } from "./ui.js"
+import { pushX, pushY, cam, scale, ORIG_SIZE } from "./ui.js"
 import { changeGameState } from "./state.js"
 
 const homeScreenImg = new Image()
@@ -50,24 +50,44 @@ function loading(ctx){
     ctx.fillText("Loading. . .", 10, 50)
 }
 
+function isNearPlayer(obj, playerPos, distHoriz, distVert){
+    return obj.position.x >= playerPos.x - distHoriz && obj.position.x <= playerPos.x + distHoriz
+    && obj.position.y >= playerPos.y - distVert && obj.position.y <= playerPos.y + distVert
+}
+
+let fps = 0;
+let lastTime = performance.now();
 function game(ctx, buffers, {wolfs, pigs, props, bullets}){
     ctx.save()
     ctx.scale(scale, scale)
     ctx.translate(pushX, pushY)
+    const halfCanvas = {
+        width: canvas.width / 2,
+        height: canvas.height / 2
+    }
     const pos = me ? me.position : {x: 0, y: 0}
-    cam.pos.x = clamp(canvas.width / 2 - pos.x, cam.minPos.x, cam.maxPos.x)
-    cam.pos.y = clamp(canvas.height / 2 - pos.y, cam.minPos.y, cam.maxPos.y)
+    cam.pos.x = clamp(halfCanvas.width - pos.x, cam.minPos.x, cam.maxPos.x)
+    cam.pos.y = clamp(halfCanvas.height - pos.y, cam.minPos.y, cam.maxPos.y)
     ctx.translate(cam.pos.x, cam.pos.y)
 
     ctx.drawImage(buffers[0].canvas, 0, 0)
 
-    const renderObjs = [...wolfs, ...pigs, ...props].sort((a, b) => a.bottom - b.bottom)
+    const renderObjs = [...wolfs, ...pigs, ...props]
+        .filter(o => isNearPlayer(o, pos, ORIG_SIZE.width, ORIG_SIZE.height))
+        .sort((a, b) => a.bottom - b.bottom)
+    const renderBullets = bullets.filter(o => isNearPlayer(o, pos, ORIG_SIZE.width, ORIG_SIZE.height))
 
     for(const obj of renderObjs) obj.draw(ctx)
-    for(const bullet of bullets) bullet.draw(ctx)
+    for(const bullet of renderBullets) bullet.draw(ctx)
 
     ctx.drawImage(buffers[1].canvas, 0, 0)
     ctx.restore()
+
+    // const now = performance.now();
+    // const delta = now - lastTime;
+    // lastTime = now;
+    // fps = 1000 / delta;
+    // if(new Date().getTime() % 50 == 0) console.log(fps)
 }
 
 export {

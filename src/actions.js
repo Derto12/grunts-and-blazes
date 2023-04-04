@@ -1,4 +1,6 @@
 const {Wolf, Pig, Bullet, Prop} = require('./sprite')
+
+
 let players = {
     wolfs: [], 
     pigs: []
@@ -13,18 +15,18 @@ function genRand(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
-const setParams = (collisionBlocks, collisionProps) => {
+function setParams(collisionBlocks, collisionProps){
     blocks = collisionBlocks
     props = [...collisionProps.trees, ...collisionProps.towers].map(p => new Prop(p)).map(p => 
         new Object({position: p.collision, width: p.collisionWidth, height: p.collisionHeight}))
 }
 
-const getStats = () => {
-    const filtered = playerMap.values.map( value => value.getStats())
+function getStats(){
+    const filtered = Array.from(playerMap.values()).map(value => value.getStats())
     return filtered
 }
 
-const getGuestName = () => {
+function getGuestName(){
     const countStr = guestCount.toString()
     const digits = 4
     const zeros = '0'.repeat(digits - countStr.length)
@@ -33,7 +35,7 @@ const getGuestName = () => {
     return 'Guest#' + zeros + countStr
 }
 
-const getNewPlayer = (team, playerParams) => {
+function getNewPlayer(team, playerParams){
     playerParams = {...playerParams, team, collisionBlocks: blocks}
     let player
     if(team === 'wolfs'){
@@ -52,11 +54,10 @@ const getNewPlayer = (team, playerParams) => {
     return player
 }
 
-const join = (id, {name, team}) => {
+function join(id, {name, team}){
     if(team !== 'wolfs') team = 'pigs'
 
     let player = getNewPlayer(team, {id, name})
-    
     playerMap.set(id, player)
     players[team].push(player)
     console.log(team, 'player joined')
@@ -64,32 +65,30 @@ const join = (id, {name, team}) => {
     return team
 }
 
-const revive = (id) => {
-    if(playerMap.has(id)){
-        const user = playerMap.get(id)
+function revive(id){
+    const user = playerMap.get(id)
+    if(user){
         const player = getNewPlayer(user.team, {id, name: user.name, kills: user.kills, deaths: user.deaths})
         playerMap.set(id, player)
         players[user.team].push(player)
     }
 }
 
-const disconnect = (id) => {
-    if(playerMap.has(id)){
-        const user = playerMap.get(id)
+function disconnect(id){
+    const user = playerMap.get(id)
+    if(user){
         players[user.team] = players[user.team].filter((p) => p.id != id)
         playerMap.delete(id)
     }
     console.log('client disconnected')
 }
 
-const move = (id, params) => {
-    if(playerMap.has(id)){
-        const player = playerMap.get(id)
-        if(!player.isDead) player.move(params)
-    }
+function move(id, params){
+    const player = playerMap.get(id)
+    if(player && !player.isDead) player.move(params)
 }
 
-const checkWolfAttack = (wolf) => {
+function checkWolfAttack(wolf){
     for(const pig of players.pigs){
         if(wolf.canAttack(pig)){
             pig.takeDmg(wolf.attackDmg)
@@ -99,7 +98,7 @@ const checkWolfAttack = (wolf) => {
     wolf.isAttacking = false
 }
 
-const update = () => {
+function update(){
     const now = new Date().getTime()
     for(const pig of players.pigs) pig.update()
     for(const wolf of players.wolfs){
@@ -125,28 +124,29 @@ const update = () => {
     return {players, bullets}
 }
 
-const attack = (id, angle) => {
+function shootBullet(pig, angle){
+    pig.attackAngle = angle
+    bullets.push(new Bullet({
+        position: {...pig.gun.position},
+        angle,
+        collisionBlocks: [...blocks, ...props],
+        owner: pig
+    }))
+    pig.isAttacking = false
+}
+
+function attack(id, angle){
     const player = playerMap.get(id)
     if(player && !player.isDead){
         player.attack()
-        if(player.team === 'pigs' && player.isAttacking && angle){
-            player.attackAngle = angle
-            bullets.push(new Bullet({
-                position: {...player.gun.position},
-                angle,
-                collisionBlocks: [...blocks, ...props],
-                owner: player
-            }))
-            player.isAttacking = false
-        }
+        if(player.team === 'pigs' 
+        && player.isAttacking && angle) shootBullet(player, angle)
     }
 }
 
-const message = (id, msg) => {
-    if(playerMap.has(id)){
-        const player = playerMap.get(id)
-        player.sendMsg(msg)
-    }
+function message(id, msg){
+    const player = playerMap.get(id)
+    if(player) player.sendMsg(msg)
 }
 
 module.exports = {

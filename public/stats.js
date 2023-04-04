@@ -1,3 +1,4 @@
+import { socket } from "./socket.js"
 const stats = document.getElementById('stats')
 const pigStats = document.getElementById('pig-stats')
 const wolfStats = document.getElementById('wolf-stats')
