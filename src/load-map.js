@@ -1,121 +1,109 @@
-const tmx = require('tmx-parser')
-const blocks = require('./collision-blocks')
+const tmx = require('tmx-parser');
+const {promisify} = require('util')
+const {treeCollisionConfig, towerCollision1Config, towerCollision2Config} = require('./props.config');
+const blocks = require('./blocks.config');
+const parseFilePromise = promisify(tmx.parseFile)
 
-const getMap = async() => {
-    const getLayer = (tiles, width, height) => {
-        let arr = []
-        for(let i = 0; i < height; i++){
-            let row = []
-            for(let j = 0; j < width; j++){
-                let tile = tiles[i * width + j]
-                if(tile) row.push(tile.id)
-                else row.push(null)
-            }
-            arr.push(row)
+const getMap = async () => {
+  const getLayer = (tiles, width, height) => {
+    return Array.from({ length: height }, (_, y) =>
+      Array.from({ length: width }, (_, x) => {
+        const tile = tiles[y * width + x];
+        return tile ? tile.id : null;
+      })
+    );
+  };
+
+  const getPropCollisions = (params) => {
+    const {
+      tiles,
+      width,
+      height,
+      tileSize,
+      startTileId,
+      relPos,
+      bottomOffset,
+      propWidth,
+      propHeight,
+      collisionWidth,
+      collisionHeight,
+      collisionOffset,
+    } = params;
+
+    const props = [];
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const tile = tiles[y * width + x];
+        if (tile) {
+          props.push({
+            id: startTileId,
+            relPos,
+            position: {
+              x: x * tileSize,
+              y: y * tileSize,
+            },
+            bottomOffset,
+            bottom: (y + 1) * tileSize + bottomOffset.y,
+            width: propWidth,
+            height: propHeight,
+            collisionWidth,
+            collisionHeight,
+            collisionOffset,
+          });
         }
-        return arr
+      }
+    }
+    return props;
+  };
+
+  try {
+    const map = await parseFilePromise('./src/assets/map.tmx');
+    const getTilesByName = (name) => map.layers.find((l) => l.name === name).tiles
+
+    const width = map.width;
+    const height = map.height;
+    const mapConfig = {
+      width, height, tileSize: map.tileWidth
     }
 
-    const getPropCollisions = ({tiles, width, height, tileSize, startTileId, relPos, bottomOffset, propWidth, propHeight, collisionWidth, collisionHeight, collisionOffset}) => {
-        let props = []
-        let posX = 0
-        let posY = 0
-        for(let i = 0; i < height; i++){
-            posX = 0
-            for(let j = 0; j < width; j++){
-                let tile = tiles[i * width + j]
-                if(tile){
-                    props.push({
-                        id: startTileId,
-                        relPos,
-                        position: {
-                            x: posX,
-                            y: posY,
-                        },
-                        bottomOffset,
-                        bottom: posY + bottomOffset.y,
-                        width: propWidth,
-                        height: propHeight,
-                        collisionWidth,
-                        collisionHeight,
-                        collisionOffset
-                    })
-                }
-                posX += tileSize
-            }
-            posY += tileSize
-        }
-        return props
-    }
+    const treeTiles = getTilesByName(treeCollisionConfig.name)
+    const trees = getPropCollisions({
+      ...mapConfig,
+      ...treeCollisionConfig,
+      tiles: treeTiles,
+    });
 
-    const {map, props} = await new Promise(function(resolve, reject){
-        tmx.parseFile('./src/assets/map.tmx', function(err, map){
-            if(err) reject(err)
+    const towerTiles1 = getTilesByName(towerCollision1Config.name)
+    const towers1Params = {
+      ...mapConfig,
+      ...towerCollision1Config,
+      tiles: towerTiles1,
+    };
 
-            const width = map.width
-            const height = map.height
+    const towerTiles2 = getTilesByName(towerCollision2Config.name)
+    const towers2Params = {
+      ...mapConfig,
+      ...towerCollision2Config,
+      tiles: towerTiles2,
+    };
 
-            const treeTiles = map.layers.find((l) => l.name === 'tree collisions').tiles
-            let trees = getPropCollisions({
-                tiles: treeTiles,
-                width, height,
-                tileSize: map.tileWidth,
-                startTileId: 19,
-                relPos: {x: 24, y: 72},
-                bottomOffset: {x: 9, y: 9},
-                collisionOffset: {x: 9, y: -62},
-                propWidth: 72,
-                propHeight: 96,
-                collisionWidth: 18,
-                collisionHeight: 72
-            })
+    const towers = [
+      ...getPropCollisions(towers1Params),
+      ...getPropCollisions(towers2Params),
+    ];
 
-            const towerTiles1 = map.layers.find((l) => l.name === 'tower collisions1').tiles
-            const towerParams = {
-                tiles: towerTiles1,
-                width, height,
-                tileSize: map.tileWidth,
-                startTileId: 2,
-                relPos: {x: 0, y: 72},
-                bottomOffset: {x: 9, y: 12},
-                collisionOffset: {x: 14, y: -59},
-                propWidth: 48,
-                propHeight: 96,
-                collisionWidth: 20,
-                collisionHeight: 74
-            }
-            let towers = getPropCollisions(towerParams)
+    const layers = map.layers
+      .filter((l) => l.visible)
+      .map((l) => getLayer(l.tiles, width, height));
 
-            const towerTiles2 = map.layers.find((l) => l.name === 'tower collisions2').tiles
-            let towers2 = getPropCollisions({
-                ...towerParams,
-                tiles: towerTiles2,
-                startTileId: 4
-            })
+    return {
+      map: { ...mapConfig, layers },
+      props: { trees, towers },
+      blocks,
+    };
+  } catch (error) {
+    console.error(error);
+  }
+};
 
-            towers.push(...towers2)
-
-            let layers = []
-            map.layers = map.layers.filter(l => l.visible)
-            for(let i = 0; i < map.layers.length; i++){
-                layers.push(getLayer(map.layers[i].tiles, width, height))
-            }
-    
-            resolve({
-                map: {
-                    width, height,
-                    tileSize: map.tileWidth, 
-                    layers
-                },
-                props: {
-                    trees,
-                    towers
-                }
-            })
-        })
-    })
-
-    return {map, blocks, props}
-}
-
-module.exports = getMap
+module.exports = getMap ;

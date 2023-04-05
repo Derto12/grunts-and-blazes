@@ -1,4 +1,5 @@
 import { socket } from "./socket.js"
+import { Wolf } from "./sprite.js"
 const stats = document.getElementById('stats')
 const pigStats = document.getElementById('pig-stats')
 const wolfStats = document.getElementById('wolf-stats')

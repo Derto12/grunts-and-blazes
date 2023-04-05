@@ -254,7 +254,6 @@ class Bullet extends ScreenObj{
     constructor(values){
         super(values)
         Object.assign(this, values);
-        this.velocity = this.calculateVelocity(this.angle)
     }
     draw(ctx){
         ctx.fillStyle = 'yellow'

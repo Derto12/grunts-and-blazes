@@ -2,12 +2,12 @@ const {twoRectCollides, sphereAndRectCollides} = require('./collision')
 const PLAYER_SPEED = 4
 
 class ScreenObj {
-    position = {x: undefined, y: undefined}
+    position = {x: null, y: null}
     velocity = {x: 0, y: 0}
     width = 24
     height = 48
-    bottom = undefined
-    orientation = undefined
+    bottom = null
+    orientation = null
     collisionBlocks = []
     hitBox = {
         offset: {
@@ -79,8 +79,8 @@ class ScreenObj {
 }
 
 class Player extends ScreenObj{
-    id = undefined
-    name = undefined
+    id = null
+    name = null
     isDead = false
     dispose = false
     maxHealth = 500
@@ -175,6 +175,7 @@ class Player extends ScreenObj{
         this.hitBox.height = 0
 
         this.isDead = true
+        this.id = null
         this.dieingAnimation = true
         setTimeout(() => {
             this.dieingAnimation = false
@@ -297,8 +298,8 @@ class Bullet extends ScreenObj{
     TTL = 400
     created = new Date().getTime()
     wolfs = []
-    angle = undefined
-    owner = undefined
+    angle = null
+    owner = null
     speed = 20
     width = 8
     height = 4
@@ -343,17 +344,21 @@ class Bullet extends ScreenObj{
 }
 
 class Prop{
-    img = undefined
+    img = null
     relPos = {
-        x: undefined,
-        y: undefined
+        x: null,
+        y: null
     }
     collision = {
-        x: undefined,
-        y: undefined
+        x: null,
+        y: null
     }
-    collisionWidth
-    collisionHeight
+    collisionOffset = {
+        x: null,
+        y: null
+    }
+    collisionWidth = null
+    collisionHeight = null
 
     constructor(values){
         Object.assign(this, values);

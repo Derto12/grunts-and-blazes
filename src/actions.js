@@ -1,6 +1,5 @@
 const {Wolf, Pig, Bullet, Prop} = require('./sprite')
 
-
 let players = {
     wolfs: [], 
     pigs: []
@@ -11,7 +10,7 @@ let blocks = []
 let props = []
 let bullets = []
 
-function genRand(min, max) {
+function randomBetween(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
@@ -32,26 +31,18 @@ function getGuestName(){
     const zeros = '0'.repeat(digits - countStr.length)
     guestCount++;
 
-    return 'Guest#' + zeros + countStr
+    return `Guest#${zeros}${countStr}`
 }
 
-function getNewPlayer(team, playerParams){
-    playerParams = {...playerParams, team, collisionBlocks: blocks}
-    let player
-    if(team === 'wolfs'){
-        player = new Wolf({...playerParams, orientation: 'left', position: {
-            x: genRand(2788, 2960),
-            y: genRand(1271, 1511)
-        }})
-    }
-    else {
-        player = new Pig({...playerParams, orientation: 'right', position: {
-            x: genRand(69, 469),
-            y: genRand(93, 453)
-        }})
-    }
-    if(player.name === '') player.name = getGuestName()
-    return player
+function getNewPlayer(team, { id, name }) {
+    if (name === '') name = getGuestName();
+    const position = (team === 'wolfs')
+        ? { x: randomBetween(2788, 2960), y: randomBetween(1271, 1511) }
+        : { x: randomBetween(69, 469), y: randomBetween(93, 453) };
+    const orientation = (team === 'wolfs') ? 'left' : 'right';
+    const playerParams = { id, name, team, position, collisionBlocks: blocks, orientation };
+    const player = (team === 'wolfs') ? new Wolf(playerParams) : new Pig(playerParams);
+    return player;
 }
 
 function join(id, {name, team}){
@@ -98,31 +89,26 @@ function checkWolfAttack(wolf){
     wolf.isAttacking = false
 }
 
-function update(){
-    const now = new Date().getTime()
-    for(const pig of players.pigs) pig.update()
-    for(const wolf of players.wolfs){
-        wolf.update()
-        if(wolf.isAttacking) checkWolfAttack(wolf)
+function update() {
+    const now = new Date().getTime();
+    let { pigs, wolfs } = players;
+  
+    for (const player of [...pigs, ...wolfs]) {
+      player.update();
+      if (player.team === 'wolfs' && player.isAttacking) {
+        checkWolfAttack(player);
+      }
     }
-    for(const bullet of bullets) bullet.update(players.wolfs)
-    
-    bullets = bullets.filter((b) => b.created + b.TTL >= now)
-    let newWolfs = []
-    for(const wolf of players.wolfs){
-        if(!wolf.dispose) newWolfs.push(wolf)
-        if(wolf.isDead && wolf.id) wolf.id = null
-    }
-    let newPigs = []
-    for(const pig of players.pigs){
-        if(!pig.dispose) newPigs.push(pig)
-        if(pig.isDead && pig.id) pig.id = null
-    }
-    players.wolfs = newWolfs
-    players.pigs = newPigs
+  
+    for (const bullet of bullets) bullet.update(wolfs);
+    bullets = bullets.filter((bullet) => bullet.created + bullet.TTL >= now);
 
-    return {players, bullets}
-}
+    let filteredWolfs = wolfs.filter((wolf) => !wolf.dispose);
+    let filteredPigs = pigs.filter((pig) => !pig.dispose);
+  
+    players = { pigs: filteredPigs, wolfs: filteredWolfs };
+    return { players, bullets };
+  }
 
 function shootBullet(pig, angle){
     pig.attackAngle = angle
